@@ -1,5 +1,6 @@
 ---
-- hosts: localhost
+- name: Testing the k8s role
+  hosts: localhost
   remote_user: root
   roles:
     - k8s-cluster-role

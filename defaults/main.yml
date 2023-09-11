@@ -1,2 +1,7 @@
 ---
 # defaults file for k8s-cluster-role
+kubernetes_version: "latest" # use "1.27.1-00" or similar to install the related version
+network_plugin: calico
+virtual_ipaddress: 192.168.178.70 # HAroxy IP
+podnetwork: 192.200.55.0/24
+control_plane_endpoint: 192.168.178.61:6443 # I ts the virtal IP if HA is used, otherwhise it's the master control node

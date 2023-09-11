@@ -1,0 +1,70 @@
+global
+    log /dev/log  local0 warning
+    chroot      /var/lib/haproxy
+    pidfile     /var/run/haproxy.pid
+    maxconn     4000
+    user        haproxy
+    group       haproxy
+    daemon
+
+   stats socket /var/lib/haproxy/stats
+
+defaults
+  log global
+  option  httplog
+  option  dontlognull
+        timeout connect 5000
+        timeout client 50000
+        timeout server 50000
+
+frontend kube-apiserver
+    bind *:6443
+    mode tcp
+    option tcplog
+    default_backend kube-apiserver
+
+frontend nginx-ingress-http
+    bind *:80
+    mode tcp
+    option tcplog
+    default_backend nginx-ingress-http
+
+frontend nginx-ingress-https
+    bind *:443
+    mode tcp
+    option tcplog
+    default_backend nginx-ingress-https
+
+
+backend kube-apiserver
+    mode tcp
+    option tcplog
+    option tcp-check
+    balance roundrobin
+    default-server inter 10s downinter 5s rise 2 fall 2 slowstart 60s maxconn 250 maxqueue 256 weight 100
+    {% for host in {{ groups.main_control }} %}
+    server {{ hostvars.host.ansible_facts.hostname }} {{ hostvars.host.ansible_facts.fqdn }}:6443 check
+    {% endfor %}
+    {% for host in {{ groups.control_nodes }} %}
+    server {{ hostvars.host.ansible_facts.hostname }} {{ hostvars.host.ansible_facts.fqdn }}:6443 check
+    {% endfor %}
+
+backend nginx-ingress-http
+    mode tcp
+    option tcplog
+    option tcp-check
+    balance roundrobin
+    default-server inter 10s downinter 5s rise 2 fall 2 slowstart 60s maxconn 250 maxqueue 256 weight 100
+    {% for host in {{ groups.worker_nodes }} %}
+    server {{ hostvars.host.ansible_facts.hostname }} {{ hostvars.host.ansible_facts.fqdn }}:30478 check
+    {% endfor %}
+
+backend nginx-ingress-https
+    mode tcp
+    option tcplog
+    option tcp-check
+    balance roundrobin
+    default-server inter 10s downinter 5s rise 2 fall 2 slowstart 60s maxconn 250 maxqueue 256 weight 100
+    {% for host in {{ groups.worker_nodes }} %}
+    server {{ hostvars.host.ansible_facts.hostname }} {{ hostvars.host.ansible_facts.fqdn }}:30479 check
+    {% endfor %}

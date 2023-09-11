@@ -1,2 +1,6 @@
 ---
-# tasks file for k8s-cluster-role
+- name: Preparation of the nodes
+  ansible.builtin.include_tasks: prepare_nodes.yml
+
+- name: Installation of the applications on the nodes
+  ansible.builtin.include_tasks: install_applications.yml

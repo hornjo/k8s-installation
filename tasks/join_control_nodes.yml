@@ -1,0 +1,10 @@
+---
+- name: Check if kubelet already exists
+  ansible.builtin.service_facts:
+  register: services
+
+- name: Joining control nodes
+  ansible.builtin.command: "{{ hostvars.control01.control_join_command.stdout }}"
+  register: joining_control
+  changed_when: joining_control.rc == 0
+  when: ansible_facts.services.kubelet.service.state != "running"

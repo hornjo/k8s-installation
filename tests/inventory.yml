@@ -1,0 +1,35 @@
+---
+all:
+  virtual_ipaddress:
+    ansible_user: user
+  children:
+    control_nodes:
+      hosts:
+        control01:
+          ansible_host: 192.168.178.61
+          ansible_password:
+        control02:
+          ansible_host: 192.168.178.62
+          ansible_password:
+        control03:
+          ansible_host: 192.168.178.63
+          ansible_password:
+    worker_nodes:
+      hosts:
+        worker01:
+          ansible_host: 192.168.178.64
+          ansible_password:
+        worker02:
+          ansible_host: 192.168.178.65
+          ansible_password:
+        worker03:
+          ansible_host: 192.168.178.66
+          ansible_password:
+    proxy_nodes:
+      hosts:
+        proxy01:
+          ansible_host: 192.168.178.67
+          ansible_password:
+        proxy02:
+          ansible_host: 192.168.178.68
+          ansible_password:

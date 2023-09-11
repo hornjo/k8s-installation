@@ -1,0 +1,30 @@
+---
+- name: Update all packages
+  ansible.builtin.apt:
+    update_cache: true
+
+- name: Upgrade all packages
+  ansible.builtin.apt:
+    upgrade: full
+
+- name: Installing neccessary packages
+  ansible.builtin.apt:
+    name:
+      - haproxy
+      - keepalived
+      - psmisc
+    state: present
+
+- name: Creating haproxy config
+  ansible.builtin.template:
+    src: haproxy.j2
+    dest: /etc/haproxy/haproxy.cfg
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Reload service for haproxy
+  ansible.builtin.systemd:
+    name: haproxy
+    state: restarted
+    enabled: true

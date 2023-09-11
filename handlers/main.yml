@@ -1,2 +1,3 @@
 ---
-# handlers file for k8s-cluster-role
+- name: Handeling when no working DNS is in place
+  ansible.builtin.include_tasks: name_resolution.yml

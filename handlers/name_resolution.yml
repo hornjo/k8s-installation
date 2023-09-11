@@ -1,0 +1,8 @@
+---
+- name: Setting the hosts files
+  ansible.builtin.lineinfile:
+    path: /etc/hosts
+    state: present
+    line: "{{ lookup('ansible.builtin.vars', 'hostvars.' + item).ansible_facts.hostname }} \
+      {{ lookup('ansible.builtin.vars', 'hostvars.' + item).ansible_facts.ip }}"
+  loop: "{{ groups.all.inventory_hostname }}"

@@ -1,0 +1,54 @@
+---
+- name: Checking if, DNS is availalbe on the first node
+  ansible.builtin.command: "ping {{ item }}"
+  register: dns_lookup
+  changed_when: dns_lookup is defined
+
+- name: Setting the hosts files
+  ansible.builtin.lineinfile:
+    path: /etc/hosts
+    state: present
+    line: "{{ item.ansible_host }} {{ inventory_hostname }}"
+  loop: "{{ groups.all }}"
+  when: dns_lookup.rc != 0
+
+- name: Update all packages
+  ansible.builtin.apt:
+    update_cache: true
+
+- name: Upgrade all packages
+  ansible.builtin.apt:
+    upgrade: full
+
+- name: Disable swap
+  ansible.builtin.command: swapoff -a
+  register: swapoff
+  changed_when: swapoff.rc == 0
+
+- name: Disable swap permanently, persist reboots
+  ansible.builtin.replace:
+    path: /etc/fstab
+    regexp: '^(\s*)([^#\n]+\s+)(\w+\s+)swap(\s+.*)$'
+    replace: '#\1\2\3swap\4'
+
+- name: Add kernel modules
+  community.general.modprobe:
+    name: "{{ item }}"
+    state: present
+    persistent: present
+  loop:
+    - overlay
+    - br_netfilter
+
+- name: Add parameters to kernel modules and reload
+  ansible.posix.sysctl:
+    name: "{{ item }}"
+    state: present
+    value: '1'
+    sysctl_file: /etc/sysctl.d/kubernetes.conf
+    sysctl_set: true
+    reload: true
+  loop:
+    - net.bridge.bridge-nf-call-ip6tables
+    - net.bridge.bridge-nf-call-iptables
+    - net.ipv4.ip_forward

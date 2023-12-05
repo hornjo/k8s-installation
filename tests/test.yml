@@ -1,6 +1,10 @@
 ---
-- name: Testing the k8s role
-  hosts: localhost
-  remote_user: root
-  roles:
-    - k8s-cluster-role
+- name: Testing the whole Role
+  hosts: all
+  tasks:
+    - name: K8s_cluster_installation role
+      ansible.builtin.include_role:
+        name: k8s_cluster_installation
+      vars:
+        k8s_cluster_installation_virtual_ipaddress: "10.33.15.225"
+        k8s_cluster_installation_control_plane_endpoint: "10.33.15.225:6443"

@@ -7,4 +7,4 @@
   ansible.builtin.command: "{{ hostvars.control01.control_join_command.stdout }}"
   register: joining_control
   changed_when: joining_control.rc == 0
-  when: ansible_facts.services.kubelet.service.state != "running"
+  when: ansible_facts.services["kubelet.service"].state != "running"

@@ -25,15 +25,11 @@ vrrp_instance haproxy-vip {
   }
   unicast_src_ip {{ ansible_facts.default_ipv4.address }}
   unicast_peer {
-    {% if  inventory_hostname == groups.proxy_nodes[0].inventory_hostname %}
-        {{ hostvars.groups.proxy_nodes[1].ansible_facts.default_ipv4.address }}
-    {% elif inventory_hostname == groups.proxy_nodes[1].inventory_hostname %}
-        {{ hostvars.groups.proxy_nodes[0].ansible_facts.default_ipv4.address }}
-    {% endif %}
+    {{ hostvars[inventory_hostname].peer_host }}
   }
 
   virtual_ipaddress {
-    {{ virtual_ipaddress }}
+    {{ k8s_cluster_installation_virtual_ipaddress }}
   }
 
   track_script {

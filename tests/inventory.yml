@@ -1,36 +1,37 @@
 ---
 all:
-  virtual_ipaddress:
+  vars:
     ansible_user: user
     ansible_become_method: sudo
+    ansible_become_pass: "user123"
+    ansible_ssh_common_args: '-o StrictHostKeyChecking=no'
   children:
     control_nodes:
       hosts:
-        control01:
+        ce01control01:
           ansible_host: 10.33.15.201
           ansible_password: "user123"
-        control02:
+        ce01control02:
           ansible_host: 10.33.15.202
           ansible_password: "user123"
-        control03:
+        ce01control03:
           ansible_host: 10.33.15.203
           ansible_password: "user123"
     worker_nodes:
       hosts:
-        worker01:
+        ce01worker01:
           ansible_host: 10.33.15.211
           ansible_password: "user123"
-        worker02:
+        ce01worker02:
           ansible_host: 10.33.15.212
           ansible_password: "user123"
-        # worker03:
-        #   ansible_host: 10.33.15.66
-        #   ansible_password: "user123"
     proxy_nodes:
       hosts:
-        proxy01:
+        ce01lb01:
           ansible_host: 10.33.15.221
           ansible_password: "user123"
-        proxy02:
+          peer_host: 10.33.15.222
+        ce01lb02:
           ansible_host: 10.33.15.222
           ansible_password: "user123"
+          peer_host: 10.33.15.221

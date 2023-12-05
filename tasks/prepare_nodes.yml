@@ -1,34 +1,51 @@
 ---
-- name: Checking if, DNS is availalbe on the first node
-  ansible.builtin.command: "ping {{ item }}"
-  register: dns_lookup
-  changed_when: dns_lookup.rc == 0
-  notify: name_resolution.yml
+- name: Checking name resolution
+  block:
+    - name: Check availability
+      ansible.builtin.command: "nslookup {{ item }}"
+      register: dns_lookup
+      changed_when: dns_lookup.rc == 0
+      with_items: '{{ groups["all"] }}'
+
+  rescue:
+    - name: Setting the hosts files
+      ansible.builtin.lineinfile:
+        dest: /etc/hosts
+        regexp: '.*{{ item }}$'
+        line: '{{ hostvars[item].ansible_host }} {{ item }}'
+        state: present
+      with_items: '{{ groups["all"] }}'
+      become: true
 
 - name: Update all packages
   ansible.builtin.apt:
     update_cache: true
+  become: true
 
 - name: Upgrade all packages
   ansible.builtin.apt:
     upgrade: full
+  become: true
 
 - name: Disable swap
   ansible.builtin.command: swapoff -a
   register: swapoff
   changed_when: swapoff.rc == 0
+  become: true
 
 - name: Disable swap permanently, persist reboots
   ansible.builtin.replace:
     path: /etc/fstab
     regexp: '^(\s*)([^#\n]+\s+)(\w+\s+)swap(\s+.*)$'
     replace: '#\1\2\3swap\4'
+  become: true
 
 - name: Add kernel modules
   community.general.modprobe:
     name: "{{ item }}"
     state: present
     persistent: present
+  become: true
   loop:
     - overlay
     - br_netfilter
@@ -41,6 +58,7 @@
     sysctl_file: /etc/sysctl.d/kubernetes.conf
     sysctl_set: true
     reload: true
+  become: true
   loop:
     - net.bridge.bridge-nf-call-ip6tables
     - net.bridge.bridge-nf-call-iptables

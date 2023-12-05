@@ -6,9 +6,11 @@
     owner: root
     group: root
     mode: '0644'
+  become: true
 
 - name: Reload service for keepalived
   ansible.builtin.systemd:
     name: keepalived
     state: restarted
     enabled: true
+  become: true

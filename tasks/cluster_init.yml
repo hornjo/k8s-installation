@@ -2,20 +2,26 @@
 - name: Check if kubelet already exists
   ansible.builtin.service_facts:
   register: services
-  become: true
 
 - name: Initialising cluster
-  ansible.builtin.command: "kubeadm init --pod-network-cidr={{ podnetwork }} --control-plane-endpoint={{ control_plane_endpoint }} --upload-certs"
+  ansible.builtin.command:
+    argv:
+      - kubeadm
+      - init
+      - --pod-network-cidr={{ k8s_cluster_installation_podnetwork }}
+      - --control-plane-endpoint={{ k8s_cluster_installation_control_plane_endpoint }}
+      - --upload-certs
   register: cluster_init
   changed_when: cluster_init.rc == 0
-  when: ansible_facts.services.kubelet.service.state != "running"
   become: true
+  when: ansible_facts.services["kubelet.service"].state != "running"
 
 - name: Create folder on control node
   ansible.builtin.file:
     path: $HOME/.kube
     state: directory
     mode: "0755"
+  become: true
 
 - name: Copy the kubectl config to control node
   ansible.builtin.copy:
@@ -23,18 +29,22 @@
     dest: $HOME/.kube/config
     remote_src: true
     mode: "0755"
+  become: true
 
 - name: Generating join certificate for control nodes
   ansible.builtin.command: kubeadm init phase upload-certs --upload-certs
   register: control_join_command_cert
   changed_when: control_join_command_cert.rc == 0
+  become: true
 
 - name: Generating join token for control nodes
   ansible.builtin.command: kubeadm token create --print-join-command --certificate-key="{{ control_join_command_cert.stdout_lines[2] }}"
   register: control_join_command
   changed_when: control_join_command.rc == 0
+  become: true
 
 - name: Generating join token for worker nodes
   ansible.builtin.command: kubeadm token create --print-join-command
   register: worker_join_command
   changed_when: worker_join_command.rc == 0
+  become: true

@@ -3,6 +3,7 @@
   ansible.builtin.apt:
     name: "{{ item }}"
     state: present
+  become: true
   loop:
     - gnupg2
     - software-properties-common
@@ -12,6 +13,7 @@
     - bash-completion
 
 - name: Install and configure containerd
+  become: true
   block:
     - name: Adding repo key for containerd
       ansible.builtin.apt_key:
@@ -43,6 +45,7 @@
         enabled: true
 
 - name: Install all required kubetools
+  become: true
   block:
     - name: Adding repo keys for the kubetools
       ansible.builtin.apt_key:
@@ -65,18 +68,18 @@
           - kubeadm
           - kubectl
         state: present
-      when: kubernetes_version == "latest"
+      when: k8s_cluster_installation_kubernetes_version == "latest"
 
-    - name: Installing all required kubetools on version "{{ kubernetes_version }}"
+    - name: Installing all required kubetools on version "{{ k8s_cluster_installation_kubernetes_version }}"
       ansible.builtin.apt:
-        name: "{{ item }}={{ kubernetes_version }}"
+        name: "{{ item }}={{ k8s_cluster_installation_kubernetes_version }}"
         state: present
         allow_downgrade: true
       loop:
         - kubelet
         - kubeadm
         - kubectl
-      when: kubernetes_version != "latest"
+      when: k8s_cluster_installation_kubernetes_version != "latest"
 
     - name: Mark the packages as hold
       ansible.builtin.dpkg_selections:
@@ -90,18 +93,15 @@
 - name: Set defaults for bash_comletion on node
   ansible.builtin.blockinfile:
     path: ~/.bashrc
+    state: present
     block: |
       if [ -f /etc/bash_completion ]; then
          . /etc/bash_completion
       fi
       source <(kubectl completion bash)"
 
-- name: Setting up kubectl autocompletion
-  ansible.builtin.command: source ~/.bashrc
-  register: bash_completion
-  changed_when: bash_completion.rc == 0
-
 - name: Installing Kubernetes python for ansible usage
   ansible.builtin.pip:
     name: kubernetes
     state: present
+  become: true

@@ -4,3 +4,28 @@
 
 - name: Installation of the applications on the nodes
   ansible.builtin.include_tasks: install_applications.yml
+  when: inventory_hostname in groups["control_nodes"] or inventory_hostname in groups["worker_nodes"]
+
+- name: Setup haproxy
+  ansible.builtin.include_tasks: setup_haproxy.yml
+  when: inventory_hostname in groups["proxy_nodes"]
+
+- name: Setup keepalived
+  ansible.builtin.include_tasks: setup_keepalived.yml
+  when: inventory_hostname in groups["proxy_nodes"]
+
+- name: Initialising cluster
+  ansible.builtin.include_tasks: cluster_init.yml
+  when: inventory_hostname == groups["control_nodes"][0]
+
+- name: Deploy network plugin
+  ansible.builtin.include_tasks: deploy_calico.yml
+  when: inventory_hostname == groups["control_nodes"][0]
+
+- name: Join control nodes to cluster
+  ansible.builtin.include_tasks: join_control_nodes.yml
+  when: inventory_hostname in groups["control_nodes"]
+
+- name: Join worker nodes to cluster
+  ansible.builtin.include_tasks: join_worker_nodes.yml
+  when: inventory_hostname in groups["worker_nodes"]

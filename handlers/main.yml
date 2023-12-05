@@ -1,3 +1,0 @@
----
-- name: Handeling when no working DNS is in place
-  ansible.builtin.include_tasks: name_resolution.yml

@@ -2,15 +2,8 @@
 - name: Checking if, DNS is availalbe on the first node
   ansible.builtin.command: "ping {{ item }}"
   register: dns_lookup
-  changed_when: dns_lookup is defined
-
-- name: Setting the hosts files
-  ansible.builtin.lineinfile:
-    path: /etc/hosts
-    state: present
-    line: "{{ item.ansible_host }} {{ inventory_hostname }}"
-  loop: "{{ groups.all }}"
-  when: dns_lookup.rc != 0
+  changed_when: dns_lookup.rc == 0
+  notify: name_resolution.yml
 
 - name: Update all packages
   ansible.builtin.apt:

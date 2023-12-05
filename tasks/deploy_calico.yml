@@ -1,5 +1,5 @@
 ---
-- name: Install Calico network add-on # Adjustment to the pod network should be added in the calico
+- name: Install Calico network add-on
   kubernetes.core.k8s:
     src: https://raw.githubusercontent.com/projectcalico/calico/master/manifests/calico.yaml
     state: present

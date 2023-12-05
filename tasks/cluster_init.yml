@@ -11,21 +11,18 @@
   when: ansible_facts.services.kubelet.service.state != "running"
   become: true
 
-- name: Copy the kubectl config
+- name: Create folder on control node
   ansible.builtin.file:
     path: $HOME/.kube
     state: directory
-    mode: '0755'
+    mode: "0755"
 
-- name: Copy the kubectl config for user
+- name: Copy the kubectl config to control node
   ansible.builtin.copy:
     src: /etc/kubernetes/admin.conf
     dest: $HOME/.kube/config
     remote_src: true
-    mode: '0755'
-    owner: user
-    group: user
-  become: true
+    mode: "0755"
 
 - name: Generating join certificate for control nodes
   ansible.builtin.command: kubeadm init phase upload-certs --upload-certs

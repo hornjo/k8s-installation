@@ -2,34 +2,35 @@
 all:
   virtual_ipaddress:
     ansible_user: user
+    ansible_become_method: sudo
   children:
     control_nodes:
       hosts:
         control01:
-          ansible_host: 192.168.178.61
-          ansible_password:
+          ansible_host: 10.33.15.201
+          ansible_password: "user123"
         control02:
-          ansible_host: 192.168.178.62
-          ansible_password:
+          ansible_host: 10.33.15.202
+          ansible_password: "user123"
         control03:
-          ansible_host: 192.168.178.63
-          ansible_password:
+          ansible_host: 10.33.15.203
+          ansible_password: "user123"
     worker_nodes:
       hosts:
         worker01:
-          ansible_host: 192.168.178.64
-          ansible_password:
+          ansible_host: 10.33.15.211
+          ansible_password: "user123"
         worker02:
-          ansible_host: 192.168.178.65
-          ansible_password:
-        worker03:
-          ansible_host: 192.168.178.66
-          ansible_password:
+          ansible_host: 10.33.15.212
+          ansible_password: "user123"
+        # worker03:
+        #   ansible_host: 10.33.15.66
+        #   ansible_password: "user123"
     proxy_nodes:
       hosts:
         proxy01:
-          ansible_host: 192.168.178.67
-          ansible_password:
+          ansible_host: 10.33.15.221
+          ansible_password: "user123"
         proxy02:
-          ansible_host: 192.168.178.68
-          ansible_password:
+          ansible_host: 10.33.15.222
+          ansible_password: "user123"

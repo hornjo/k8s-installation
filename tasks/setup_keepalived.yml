@@ -6,8 +6,6 @@
     owner: root
     group: root
     mode: '0644'
-  with_items:
-    - peer: "{{ hostvars.groups.proxy_nodes[1].ansible_facts.ip }}"
 
 - name: Reload service for keepalived
   ansible.builtin.systemd:

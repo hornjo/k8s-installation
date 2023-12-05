@@ -16,14 +16,14 @@ vrrp_script chk_haproxy {
 vrrp_instance haproxy-vip {
   state BACKUP
   priority 100
-  interface {{ ansible_facts.default_ipv4.interface }}         # Network card
+  interface {{ ansible_facts.default_ipv4.interface }}
   virtual_router_id 60
   advert_int 1
   authentication {
     auth_type PASS
     auth_pass 1111
   }
-  unicast_src_ip {{ ansible_facts.default_ipv4.address }}      # The IP address of this machine
+  unicast_src_ip {{ ansible_facts.default_ipv4.address }}
   unicast_peer {
     {% if  inventory_hostname == groups.proxy_nodes[0].inventory_hostname %}
         {{ hostvars.groups.proxy_nodes[1].ansible_facts.default_ipv4.address }}
@@ -33,7 +33,7 @@ vrrp_instance haproxy-vip {
   }
 
   virtual_ipaddress {
-    {{ virtual_ipaddress }}                  # The VIP address
+    {{ virtual_ipaddress }}
   }
 
   track_script {

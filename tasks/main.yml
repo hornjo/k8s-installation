@@ -1,18 +1,18 @@
 ---
-# - name: Preparation of the nodes
-#   ansible.builtin.include_tasks: prepare_nodes.yml
+- name: Preparation of the nodes
+  ansible.builtin.include_tasks: prepare_nodes.yml
 
-# - name: Installation of the applications on the nodes
-#   ansible.builtin.include_tasks: install_applications.yml
-#   when: inventory_hostname in groups["control_nodes"] or inventory_hostname in groups["worker_nodes"]
+- name: Installation of the applications on the nodes
+  ansible.builtin.include_tasks: install_applications.yml
+  when: inventory_hostname in groups["control_nodes"] or inventory_hostname in groups["worker_nodes"]
 
-# - name: Setup haproxy
-#   ansible.builtin.include_tasks: setup_haproxy.yml
-#   when: inventory_hostname in groups["proxy_nodes"]
+- name: Setup haproxy
+  ansible.builtin.include_tasks: setup_haproxy.yml
+  when: inventory_hostname in groups["proxy_nodes"]
 
-# - name: Setup keepalived
-#   ansible.builtin.include_tasks: setup_keepalived.yml
-#   when: inventory_hostname in groups["proxy_nodes"]
+- name: Setup keepalived
+  ansible.builtin.include_tasks: setup_keepalived.yml
+  when: inventory_hostname in groups["proxy_nodes"]
 
 - name: Initialising cluster
   ansible.builtin.include_tasks: cluster_init.yml

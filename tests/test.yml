@@ -6,5 +6,5 @@
       ansible.builtin.include_role:
         name: k8s_cluster_installation
       vars:
-        k8s_cluster_installation_virtual_ipaddress: "10.33.15.225"
-        k8s_cluster_installation_control_plane_endpoint: "10.33.15.225:6443"
+        k8s_cluster_installation_virtual_ipaddress: "192.168.178.70"
+        k8s_cluster_installation_control_plane_endpoint: "192.168.178.70:6443"

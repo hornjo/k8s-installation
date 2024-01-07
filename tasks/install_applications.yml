@@ -98,7 +98,7 @@
       if [ -f /etc/bash_completion ]; then
          . /etc/bash_completion
       fi
-      source <(kubectl completion bash)"
+      source <(kubectl completion bash)
 
 - name: Installing Kubernetes python for ansible usage
   ansible.builtin.pip:

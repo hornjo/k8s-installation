@@ -1,4 +1,4 @@
-k8s_cluster_installation_kubernetes_version: latest # use "1.27.1-00" or similar to install the related version
+k8s_cluster_installation_kubernetes_version: present # use "1.27.1-00" or similar to install the related version
 k8s_cluster_installation_network_plugin: calico
 k8s_cluster_installation_virtual_ipaddress: 192.168.178.70 # HAroxy IP
 k8s_cluster_installation_podnetwork: "192.200.55.0/24"

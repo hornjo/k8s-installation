@@ -1,22 +1,4 @@
 ---
-- name: Checking name resolution
-  block:
-    - name: Check availability
-      ansible.builtin.command: "nslookup {{ item }}"
-      register: dns_lookup
-      changed_when: dns_lookup.rc == 0
-      with_items: '{{ groups["all"] }}'
-
-  rescue:
-    - name: Setting the hosts files
-      ansible.builtin.lineinfile:
-        dest: /etc/hosts
-        regexp: '.*{{ item }}$'
-        line: '{{ hostvars[item].ansible_host }} {{ item }}'
-        state: present
-      with_items: '{{ groups["all"] }}'
-      become: true
-
 - name: Update all packages
   ansible.builtin.apt:
     update_cache: true

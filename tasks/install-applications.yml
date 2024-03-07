@@ -49,7 +49,7 @@
   block:
     - name: Adding repo keys for the kubetools
       ansible.builtin.apt_key:
-        url: https://packages.cloud.google.com/apt/doc/apt-key.gpg
+        url: https://pkgs.k8s.io/core:/stable:/v1.29/deb/Release.key
         state: present
 
     - name: Adding repo for kubetools
@@ -68,18 +68,18 @@
           - kubeadm
           - kubectl
         state: present
-      when: k8s_cluster_installation_kubernetes_version == "latest"
+      when: k8s_installation_kubernetes_version == "latest"
 
-    - name: Installing all required kubetools on version "{{ k8s_cluster_installation_kubernetes_version }}"
+    - name: Installing all required kubetools on version "{{ k8s_installation_kubernetes_version }}"
       ansible.builtin.apt:
-        name: "{{ item }}={{ k8s_cluster_installation_kubernetes_version }}"
+        name: "{{ item }}={{ k8s_installation_kubernetes_version }}"
         state: present
         allow_downgrade: true
       loop:
         - kubelet
         - kubeadm
         - kubectl
-      when: k8s_cluster_installation_kubernetes_version != "latest"
+      when: k8s_installation_kubernetes_version != "latest"
 
     - name: Mark the packages as hold
       ansible.builtin.dpkg_selections:

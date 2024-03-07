@@ -3,5 +3,5 @@
   kubernetes.core.k8s:
     src: https://raw.githubusercontent.com/projectcalico/calico/master/manifests/calico.yaml
     state: present
-  when: k8s_cluster_installation_network_plugin == 'calico'
+  when: k8s_installation_network_plugin == 'calico'
   become: true

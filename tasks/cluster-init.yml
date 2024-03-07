@@ -8,8 +8,8 @@
     argv:
       - kubeadm
       - init
-      - --pod-network-cidr={{ k8s_cluster_installation_podnetwork }}
-      - --control-plane-endpoint={{ k8s_cluster_installation_control_plane_endpoint }}
+      - --pod-network-cidr={{ k8s_installation_podnetwork }}
+      - --control-plane-endpoint={{ k8s_installation_control_plane_endpoint }}
       - --upload-certs
   register: cluster_init
   changed_when: cluster_init.rc == 0

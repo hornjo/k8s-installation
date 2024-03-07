@@ -29,7 +29,7 @@ vrrp_instance haproxy-vip {
   }
 
   virtual_ipaddress {
-    {{ k8s_cluster_installation_virtual_ipaddress }}
+    {{ k8s_installation_virtual_ipaddress }}
   }
 
   track_script {

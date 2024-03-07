@@ -1,31 +1,31 @@
 ---
 - name: Preparation of the nodes
-  ansible.builtin.include_tasks: prepare_nodes.yml
+  ansible.builtin.include-tasks: prepare-nodes.yml
 
 - name: Installation of the applications on the nodes
-  ansible.builtin.include_tasks: install_applications.yml
-  when: inventory_hostname in groups["control_nodes"] or inventory_hostname in groups["worker_nodes"]
+  ansible.builtin.include-tasks: install-applications.yml
+  when: inventory-hostname in groups["control-nodes"] or inventory-hostname in groups["worker-nodes"]
 
 - name: Setup haproxy
-  ansible.builtin.include_tasks: setup_haproxy.yml
-  when: inventory_hostname in groups["proxy_nodes"]
+  ansible.builtin.include-tasks: setup-haproxy.yml
+  when: inventory-hostname in groups["proxy-nodes"]
 
 - name: Setup keepalived
-  ansible.builtin.include_tasks: setup_keepalived.yml
-  when: inventory_hostname in groups["proxy_nodes"]
+  ansible.builtin.include-tasks: setup-keepalived.yml
+  when: inventory-hostname in groups["proxy-nodes"]
 
 - name: Initialising cluster
-  ansible.builtin.include_tasks: cluster_init.yml
-  when: inventory_hostname == groups["control_nodes"][0]
+  ansible.builtin.include-tasks: cluster-init.yml
+  when: inventory-hostname == groups["control-nodes"][0]
 
 - name: Deploy network plugin
-  ansible.builtin.include_tasks: deploy_calico.yml
-  when: inventory_hostname == groups["control_nodes"][0]
+  ansible.builtin.include-tasks: deploy-calico.yml
+  when: inventory-hostname == groups["control-nodes"][0]
 
 - name: Join control nodes to cluster
-  ansible.builtin.include_tasks: join_control_nodes.yml
-  when: inventory_hostname in groups["control_nodes"]
+  ansible.builtin.include-tasks: join-control-nodes.yml
+  when: inventory-hostname in groups["control-nodes"]
 
 - name: Join worker nodes to cluster
-  ansible.builtin.include_tasks: join_worker_nodes.yml
-  when: inventory_hostname in groups["worker_nodes"]
+  ansible.builtin.include-tasks: join-worker-nodes.yml
+  when: inventory-hostname in groups["worker-nodes"]

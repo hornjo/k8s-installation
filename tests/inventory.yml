@@ -2,36 +2,19 @@
 all:
   vars:
     ansible_user: user
-    ansible_become_method: sudo
-    ansible_become_pass: "user123"
-    ansible_ssh_common_args: '-o StrictHostKeyChecking=no'
   children:
-    control_nodes:
+    control-nodes:
       hosts:
-        ce01control01:
-          ansible_host: 192.168.178.61
-          ansible_password: "user123"
-        ce01control02:
-          ansible_host: 192.168.178.64
-          ansible_password: "user123"
-        ce01control03:
-          ansible_host: 192.168.178.65
-          ansible_password: "user123"
-    worker_nodes:
+        lx-k8s-ctl01:
+        lx-k8s-ctl02:
+        lx-k8s-ctl03:
+    worker-nodes:
       hosts:
-        ce01worker01:
-          ansible_host: 192.168.178.62
-          ansible_password: "user123"
-        ce01worker02:
-          ansible_host: 192.168.178.63
-          ansible_password: "user123"
-    proxy_nodes:
+        lx-k8s-wrk01:
+        lx-k8s-wrk02:
+    proxy-nodes:
       hosts:
-        ce01lb01:
-          ansible_host: 192.168.178.68
-          ansible_password: "user123"
-          peer_host: 192.168.178.69
-        ce01lb02:
-          ansible_host: 192.168.178.69
-          ansible_password: "user123"
-          peer_host: 192.168.178.68
+        lx-lb01:
+          peer_host: lx-lb02
+        lx-lb02:
+          peer_host: lx-lb01

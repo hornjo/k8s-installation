@@ -21,8 +21,15 @@
         state: present
 
     - name: Adding repo for containerd
+      when: ansible_architecture == 'x86_64'
       ansible.builtin.apt_repository:
         repo: deb [arch=amd64] https://download.docker.com/linux/ubuntu focal stable
+        state: present
+
+    - name: Adding repo for containerd
+      when: ansible_architecture == 'aarch64'
+      ansible.builtin.apt_repository:
+        repo: deb [arch=arm64] https://download.docker.com/linux/ubuntu focal stable
         state: present
 
     - name: Installing containerd
@@ -43,7 +50,7 @@
   block:
     - name: Adding repo keys for the kubetools
       ansible.builtin.apt_key:
-        url: https://pkgs.k8s.io/core:/stable:/v1.29/deb/Release.key
+        url: https://pkgs.k8s.io/core:/stable:/v{{ k8s_installation_kubernetes_version[:4] }}/deb/Release.key
         state: present
       when: ansible_os_family == 'Debian'
 

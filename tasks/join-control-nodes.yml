@@ -4,7 +4,7 @@
   register: services
 
 - name: Joining control nodes
-  ansible.builtin.command: "{{ hostvars[groups['control_nodes'][0]].control_join_command.stdout }}"
+  ansible.builtin.command: "{{ hostvars[groups['control-nodes'][0]].control_join_command.stdout }}"
   register: joining_control
   changed_when: joining_control.rc == 0
   become: true

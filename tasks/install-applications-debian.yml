@@ -1,9 +1,8 @@
 ---
-- name: Installing dependencies
+- name: Installing dependencies for Debian
   ansible.builtin.apt:
     name: "{{ item }}"
     state: present
-  become: true
   loop:
     - gnupg2
     - software-properties-common
@@ -11,9 +10,10 @@
     - ca-certificates
     - python3-pip
     - bash-completion
+  when: ansible_os_family == 'Debian'
 
-- name: Install and configure containerd
-  become: true
+- name: Install and configure containerd for Debian
+  when: ansible_os_family == 'Debian'
   block:
     - name: Adding repo key for containerd
       ansible.builtin.apt_key:
@@ -32,54 +32,37 @@
 
     - name: Configuring containerd by adding the default config
       ansible.builtin.copy:
-        src: ../templates/config.toml
+        src: config.toml
         dest: /etc/containerd/config.toml
-        owner: user
-        group: user
+        owner: "{{ ansible_user }}"
+        group: "{{ ansible_user }}"
         mode: '0644'
-
-    - name: Reload service for containerd
-      ansible.builtin.systemd:
-        name: containerd
-        state: restarted
-        enabled: true
+      notify: Reload containerd
 
 - name: Install all required kubetools
-  become: true
   block:
     - name: Adding repo keys for the kubetools
       ansible.builtin.apt_key:
         url: https://pkgs.k8s.io/core:/stable:/v1.29/deb/Release.key
         state: present
+      when: ansible_os_family == 'Debian'
 
     - name: Adding repo for kubetools
       ansible.builtin.apt_repository:
         repo: deb http://apt.kubernetes.io/ kubernetes-xenial main
         state: present
-
-    - name: Update all packages
-      ansible.builtin.apt:
-        update_cache: true
-
-    - name: Installing all required kubetools at latest version
-      ansible.builtin.apt:
-        name:
-          - kubelet
-          - kubeadm
-          - kubectl
-        state: present
-      when: k8s_installation_kubernetes_version == "latest"
+      when: ansible_os_family == 'Debian'
 
     - name: Installing all required kubetools on version "{{ k8s_installation_kubernetes_version }}"
       ansible.builtin.apt:
-        name: "{{ item }}={{ k8s_installation_kubernetes_version }}"
+        name: "{{ item }}-{{ k8s_installation_kubernetes_version }}"
         state: present
         allow_downgrade: true
       loop:
         - kubelet
         - kubeadm
         - kubectl
-      when: k8s_installation_kubernetes_version != "latest"
+      when: ansible_os_family == 'Debian' and k8s_installation_kubernetes_version != "latest"
 
     - name: Mark the packages as hold
       ansible.builtin.dpkg_selections:

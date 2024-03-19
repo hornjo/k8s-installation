@@ -1,5 +1,6 @@
-k8s_installation_kubernetes_version: present # use "1.27.1-00" or similar to install the related version
+k8s_installation_kubernetes_version: 1.29.2-00 # use "1.27.1-00" or similar to install the related version
+k8s_installation_crio_version: 1.29 # use "1.29" or similar to install the related version
 k8s_installation_network_plugin: calico
-k8s_installation_virtual_ipaddress: 192.168.178.70 # HAroxy IP
+k8s_installation_virtual_ipaddress: 192.168.178.70 # LB ip
 k8s_installation_podnetwork: "192.200.55.0/24"
 k8s_installation_control_plane_endpoint: "192.168.178.61:6443" # I ts the virtal IP if HA is used, otherwhise it's the master control node

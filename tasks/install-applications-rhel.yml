@@ -1,0 +1,74 @@
+---
+- name: Installing dependencies for RHEL
+  ansible.builtin.dnf:
+    name: "{{ item }}"
+    state: present
+  loop:
+    - gnupg2
+    - python3-pip
+    - bash-completion
+
+  when: ansible_os_family == 'RedHat'
+
+- name: Install and container runtime for RHEL
+  when: ansible_os_family == 'RedHat'
+  block:
+    - name: Adding containerd repo
+      ansible.builtin.copy:
+        src: docker-ce.repo
+        dest: /etc/yum.repos.d/docker-ce.repo
+        owner: "{{ ansible_user }}"
+        group: "{{ ansible_user }}"
+        mode: '0644'
+
+      when: ansible_os_family == 'RedHat'
+
+    - name: Install containerd.io
+      ansible.builtin.dnf:
+        name: containerd.io
+        state: present
+
+    - name: Configuring containerd by adding the default config
+      ansible.builtin.copy:
+        src: config.toml
+        dest: /etc/containerd/config.toml
+        owner: "{{ ansible_user }}"
+        group: "{{ ansible_user }}"
+        mode: '0644'
+      notify: Reload containerd
+
+- name: Adding repo keys for the kubetools
+  ansible.builtin.template:
+    src: kubernetes.repo.j2
+    dest: /etc/yum.repos.d/kubernetes.repo
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    mode: '0644'
+  when: ansible_os_family == 'RedHat'
+
+- name: Installing all required kubetools on version "{{ k8s_installation_kubernetes_version }}"
+  ansible.builtin.dnf:
+    name:
+      - kubelet
+      - kubeadm
+      - kubectl
+    state: present
+    disable_excludes: all
+    allow_downgrade: true
+  when: ansible_os_family == 'RedHat'
+
+- name: Set defaults for bash_completion on node
+  ansible.builtin.blockinfile:
+    path: ~/.bashrc
+    state: present
+    block: |
+      if [ -f /etc/bash_completion ]; then
+         . /etc/bash_completion
+      fi
+      source <(kubectl completion bash)
+
+- name: Installing Kubernetes python for ansible usage
+  ansible.builtin.pip:
+    name: kubernetes
+    state: present
+  become: true

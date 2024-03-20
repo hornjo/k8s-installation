@@ -1,31 +1,28 @@
 ---
 - name: Preparation of the nodes
-  ansible.builtin.include-tasks: prepare-nodes.yml
+  ansible.builtin.include_tasks: prepare-nodes.yml
+  when: inventory_hostname in groups["control-nodes"] or inventory_hostname in groups["worker-nodes"]
 
 - name: Installation of the applications on the nodes
-  ansible.builtin.include-tasks: install-applications.yml
-  when: inventory-hostname in groups["control-nodes"] or inventory-hostname in groups["worker-nodes"]
+  ansible.builtin.include_tasks: install-applications-debian.yml
+  when: ansible_os_family == 'Debian' and inventory_hostname in groups["control-nodes"] or inventory_hostname in groups["worker-nodes"]
 
-- name: Setup haproxy
-  ansible.builtin.include-tasks: setup-haproxy.yml
-  when: inventory-hostname in groups["proxy-nodes"]
-
-- name: Setup keepalived
-  ansible.builtin.include-tasks: setup-keepalived.yml
-  when: inventory-hostname in groups["proxy-nodes"]
+- name: Installation of the applications on the nodes
+  ansible.builtin.include_tasks: install-applications-rhel.yml
+  when: ansible_os_family == 'RedHat' and inventory_hostname in groups["control-nodes"] or inventory_hostname in groups["worker-nodes"]
 
 - name: Initialising cluster
-  ansible.builtin.include-tasks: cluster-init.yml
-  when: inventory-hostname == groups["control-nodes"][0]
+  ansible.builtin.include_tasks: cluster-init.yml
+  when: inventory_hostname == groups["control-nodes"][0]
 
 - name: Deploy network plugin
-  ansible.builtin.include-tasks: deploy-calico.yml
-  when: inventory-hostname == groups["control-nodes"][0]
+  ansible.builtin.include_tasks: deploy-calico.yml
+  when: inventory_hostname == groups["control-nodes"][0]
 
 - name: Join control nodes to cluster
-  ansible.builtin.include-tasks: join-control-nodes.yml
-  when: inventory-hostname in groups["control-nodes"]
+  ansible.builtin.include_tasks: join-control-nodes.yml
+  when: inventory_hostname in groups["control-nodes"]
 
 - name: Join worker nodes to cluster
-  ansible.builtin.include-tasks: join-worker-nodes.yml
-  when: inventory-hostname in groups["worker-nodes"]
+  ansible.builtin.include_tasks: join-worker-nodes.yml
+  when: inventory_hostname in groups["worker-nodes"]

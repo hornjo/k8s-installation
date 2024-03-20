@@ -10,10 +10,12 @@
     - ca-certificates
     - python3-pip
     - bash-completion
+  become: true
   when: ansible_os_family == 'Debian'
 
 - name: Install and configure containerd for Debian
   when: ansible_os_family == 'Debian'
+  become: true
   block:
     - name: Adding repo key for containerd
       ansible.builtin.apt_key:
@@ -47,6 +49,7 @@
       notify: Reload containerd
 
 - name: Install all required kubetools
+  become: true
   block:
     - name: Adding repo keys for the kubetools
       ansible.builtin.apt_key:

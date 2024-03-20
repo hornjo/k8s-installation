@@ -2,6 +2,7 @@
 - name: Check if kubelet already exists
   ansible.builtin.service_facts:
   register: services
+  become: true
 
 - name: Initialising cluster
   ansible.builtin.command:

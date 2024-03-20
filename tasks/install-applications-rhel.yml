@@ -7,11 +7,12 @@
     - gnupg2
     - python3-pip
     - bash-completion
-
+  become: true
   when: ansible_os_family == 'RedHat'
 
 - name: Install and container runtime for RHEL
   when: ansible_os_family == 'RedHat'
+  become: true
   block:
     - name: Adding containerd repo
       ansible.builtin.copy:
@@ -38,6 +39,7 @@
       notify: Reload containerd
 
 - name: Adding repo keys for the kubetools
+  become: true
   ansible.builtin.template:
     src: kubernetes.repo.j2
     dest: /etc/yum.repos.d/kubernetes.repo
@@ -47,6 +49,7 @@
   when: ansible_os_family == 'RedHat'
 
 - name: Installing all required kubetools on version "{{ k8s_installation_kubernetes_version }}"
+  become: true
   ansible.builtin.dnf:
     name:
       - kubelet

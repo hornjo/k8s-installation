@@ -3,6 +3,7 @@
   ansible.builtin.command: swapoff -a
   register: swapoff
   changed_when: swapoff.rc == 0
+  become: true
 
 - name: Disable swap permanently, persist reboots
   ansible.builtin.replace:

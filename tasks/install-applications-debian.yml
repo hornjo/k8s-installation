@@ -5,39 +5,53 @@
     state: present
   loop:
     - gnupg2
+    - curl
     - software-properties-common
     - apt-transport-https
     - ca-certificates
     - python3-pip
     - bash-completion
+    - python3-kubernetes
   become: true
   when: ansible_os_family == 'Debian'
+
+- name: Create keyring dir
+  ansible.builtin.file:
+    path: /etc/apt/keyrings
+    state: directory
+    mode: '0755'
 
 - name: Install and configure containerd for Debian
   when: ansible_os_family == 'Debian'
   become: true
   block:
-    - name: Adding repo key for containerd
-      ansible.builtin.apt_key:
-        url: https://download.docker.com/linux/ubuntu/gpg
+    - name: Adding repo keys
+      ansible.builtin.get_url:
+        url: "https://download.docker.com/linux/{{ ansible_distribution | lower }}/gpg"
+        dest: /etc/apt/keyrings/docker.asc
+        mode: '0644'
+
+    - name: Adding repo for containerd
+      when: ansible_os_family == 'Debian' and ansible_architecture == 'x86_64'
+      ansible.builtin.apt_repository:
+        repo: "deb [arch=amd64 signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/{{ ansible_distribution | lower }} {{ ansible_distribution_release | lower }} stable"
+        filename: docker
+        update_cache: true
         state: present
 
     - name: Adding repo for containerd
-      when: ansible_architecture == 'x86_64'
+      when: ansible_os_family == 'Debian' and ansible_architecture == 'aach64'
       ansible.builtin.apt_repository:
-        repo: deb [arch=amd64] https://download.docker.com/linux/ubuntu focal stable
-        state: present
-
-    - name: Adding repo for containerd
-      when: ansible_architecture == 'aarch64'
-      ansible.builtin.apt_repository:
-        repo: deb [arch=arm64] https://download.docker.com/linux/ubuntu focal stable
+        repo: "deb [arch=arm64 signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/{{ ansible_distribution | lower }} {{ ansible_distribution_release | lower }} stable"
+        filename: docker
+        update_cache: true
         state: present
 
     - name: Installing containerd
       ansible.builtin.apt:
-        name: containerd.io
+        name: containerd
         state: present
+      become: true
 
     - name: Configuring containerd by adding the default config
       ansible.builtin.copy:
@@ -46,42 +60,53 @@
         owner: "{{ ansible_user }}"
         group: "{{ ansible_user }}"
         mode: '0644'
-      notify: Reload containerd
+      become: true
 
-- name: Install all required kubetools
+    - name: Reload containerd
+      ansible.builtin.systemd:
+        name: containerd
+        state: restarted
+        enabled: true
+      become: true
+
+- name: Add Kubernetes apt gpg to trusted repository key
+  ansible.builtin.get_url:
+    url: https://pkgs.k8s.io/core:/stable:/v{{ k8s_installation_kubernetes_version }}/deb/Release.key
+    dest: /etc/apt/trusted.gpg.d/kuberntes.asc
+    mode: '0644'
+    force: true
   become: true
-  block:
-    - name: Adding repo keys for the kubetools
-      ansible.builtin.apt_key:
-        url: https://pkgs.k8s.io/core:/stable:/v{{ k8s_installation_kubernetes_version[:4] }}/deb/Release.key
-        state: present
-      when: ansible_os_family == 'Debian'
 
-    - name: Adding repo for kubetools
-      ansible.builtin.apt_repository:
-        repo: deb http://apt.kubernetes.io/ kubernetes-xenial main
-        state: present
-      when: ansible_os_family == 'Debian'
+- name: Adding repo for kubetools
+  when: ansible_os_family == 'Debian'
+  ansible.builtin.apt_repository:
+    repo: "deb https://pkgs.k8s.io/core:/stable:/v{{ k8s_installation_kubernetes_version }}/deb/ /"
+    filename: kubernetes
+    update_cache: true
+    state: present
+  become: true
 
-    - name: Installing all required kubetools on version "{{ k8s_installation_kubernetes_version }}"
-      ansible.builtin.apt:
-        name: "{{ item }}-{{ k8s_installation_kubernetes_version }}"
-        state: present
-        allow_downgrade: true
-      loop:
-        - kubelet
-        - kubeadm
-        - kubectl
-      when: ansible_os_family == 'Debian' and k8s_installation_kubernetes_version != "latest"
+- name: Installing all required kubetools on version "{{ k8s_installation_kubernetes_version }}"
+  ansible.builtin.apt:
+    name: "{{ item }}"
+    state: present
+    allow_downgrade: true
+  loop:
+    - kubelet
+    - kubeadm
+    - kubectl
+  when: ansible_os_family == 'Debian'
+  become: true
 
-    - name: Mark the packages as hold
-      ansible.builtin.dpkg_selections:
-        name: "{{ item }}"
-        selection: hold
-      loop:
-        - kubelet
-        - kubeadm
-        - kubectl
+- name: Mark the packages as hold
+  ansible.builtin.dpkg_selections:
+    name: "{{ item }}"
+    selection: hold
+  loop:
+    - kubelet
+    - kubeadm
+    - kubectl
+  become: true
 
 - name: Set defaults for bash_comletion on node
   ansible.builtin.blockinfile:
@@ -92,9 +117,3 @@
          . /etc/bash_completion
       fi
       source <(kubectl completion bash)
-
-- name: Installing Kubernetes python for ansible usage
-  ansible.builtin.pip:
-    name: kubernetes
-    state: present
-  become: true

@@ -1,7 +1,7 @@
 [kubernetes]
 name=Kubernetes
-baseurl=https://pkgs.k8s.io/core:/stable:/v{{ k8s_installation_kubernetes_version[:4] }}/rpm/
+baseurl=https://pkgs.k8s.io/core:/stable:/v{{ k8s_installation_kubernetes_version }}/rpm/
 enabled=1
 gpgcheck=1
-gpgkey=https://pkgs.k8s.io/core:/stable:/v{{ k8s_installation_kubernetes_version[:4] }}/rpm/repodata/repomd.xml.key
+gpgkey=https://pkgs.k8s.io/core:/stable:/v{{ k8s_installation_kubernetes_version }}/rpm/repodata/repomd.xml.key
 exclude=kubelet,kubeadm,kubectl,cri-tools,kubernetes-cni

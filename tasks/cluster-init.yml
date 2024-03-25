@@ -4,6 +4,18 @@
   register: services
   become: true
 
+- name: Pulling kubernetes images
+  ansible.builtin.command:
+    argv:
+      - kubeadm
+      - config
+      - images
+      - pull
+  register: image_pull
+  changed_when: image_pull.rc == 0
+  become: true
+  when: ansible_facts.services["kubelet.service"].state != "running"
+
 - name: Initialising cluster
   ansible.builtin.command:
     argv:
@@ -11,7 +23,6 @@
       - init
       - --pod-network-cidr={{ k8s_installation_podnetwork }}
       - --control-plane-endpoint={{ k8s_installation_control_plane_endpoint }}
-      - --upload-certs
   register: cluster_init
   changed_when: cluster_init.rc == 0
   become: true

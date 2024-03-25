@@ -58,7 +58,7 @@ version = 2
     max_container_log_line_size = 16384
     netns_mounts_under_state_dir = false
     restrict_oom_score_adj = false
-    sandbox_image = "registry.k8s.io/pause:3.6"
+    sandbox_image = "registry.k8s.io/pause:3.9"
     selinux_category_range = 1024
     stats_collect_period = 10
     stream_idle_timeout = "4h0m0s"
@@ -162,10 +162,6 @@ version = 2
   [plugins."io.containerd.internal.v1.restart"]
     interval = "10s"
 
-  [plugins."io.containerd.internal.v1.tracing"]
-    sampling_ratio = 1.0
-    service_name = "containerd"
-
   [plugins."io.containerd.metadata.v1.bolt"]
     content_sharing_policy = "shared"
 
@@ -213,11 +209,6 @@ version = 2
 
   [plugins."io.containerd.snapshotter.v1.zfs"]
     root_path = ""
-
-  [plugins."io.containerd.tracing.processor.v1.otlp"]
-    endpoint = ""
-    insecure = false
-    protocol = ""
 
 [proxy_plugins]
 

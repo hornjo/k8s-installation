@@ -5,11 +5,13 @@
 
 - name: Installation of the applications on the nodes
   ansible.builtin.include_tasks: install-applications-debian.yml
-  when: ansible_os_family == 'Debian' and inventory_hostname in groups["control-nodes"] or inventory_hostname in groups["worker-nodes"]
+  when: ansible_os_family == 'Debian' and inventory_hostname in groups["control-nodes"]
+        or ansible_os_family == 'Debian' and inventory_hostname in groups["worker-nodes"]
 
 - name: Installation of the applications on the nodes
   ansible.builtin.include_tasks: install-applications-rhel.yml
-  when: ansible_os_family == 'RedHat' and inventory_hostname in groups["control-nodes"] or inventory_hostname in groups["worker-nodes"]
+  when: ansible_os_family == 'RedHat' and inventory_hostname in groups["control-nodes"]
+        or ansible_os_family == 'RedHat' and inventory_hostname in groups["worker-nodes"]
 
 - name: Initialising cluster
   ansible.builtin.include_tasks: cluster-init.yml

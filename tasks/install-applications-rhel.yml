@@ -36,7 +36,12 @@
         owner: "{{ ansible_user }}"
         group: "{{ ansible_user }}"
         mode: '0644'
-      notify: Reload containerd
+
+    - name: Reload containerd
+      ansible.builtin.systemd:
+        name: containerd
+        state: restarted
+        enabled: true
 
 - name: Adding repo keys for the kubetools
   become: true
@@ -69,9 +74,11 @@
          . /etc/bash_completion
       fi
       source <(kubectl completion bash)
+  when: ansible_os_family == 'RedHat'
 
 - name: Installing Kubernetes python for ansible usage
   ansible.builtin.pip:
     name: kubernetes
     state: present
   become: true
+  when: ansible_os_family == 'RedHat'

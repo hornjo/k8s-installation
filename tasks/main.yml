@@ -4,12 +4,12 @@
   when: inventory_hostname in groups["control-nodes"] or inventory_hostname in groups["worker-nodes"]
 
 - name: Installation of the applications on the nodes
-  ansible.builtin.include_tasks: install-applications-debian.yml
+  ansible.builtin.include_tasks: install-app-deb.yml
   when: ansible_os_family == 'Debian' and inventory_hostname in groups["control-nodes"]
         or ansible_os_family == 'Debian' and inventory_hostname in groups["worker-nodes"]
 
 - name: Installation of the applications on the nodes
-  ansible.builtin.include_tasks: install-applications-rhel.yml
+  ansible.builtin.include_tasks: install-app-rhel.yml
   when: ansible_os_family == 'RedHat' and inventory_hostname in groups["control-nodes"]
         or ansible_os_family == 'RedHat' and inventory_hostname in groups["worker-nodes"]
 
@@ -28,3 +28,7 @@
 - name: Join worker nodes to cluster
   ansible.builtin.include_tasks: join-worker-nodes.yml
   when: inventory_hostname in groups["worker-nodes"]
+
+- name: Taint control nodes as workers
+  ansible.builtin.include_tasks: taint-nodes.yml
+  when: inventory_hostname == groups["control-nodes"][0]

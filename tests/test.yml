@@ -9,3 +9,4 @@
         k8s_installation_control_plane_endpoint: "10.10.1.101:6443"
         k8s_installation_kubernetes_version: "1.29"
         k8s_installation_podnetwork: "192.200.55.0/24"
+        k8s_installation_control_plane_workload: true

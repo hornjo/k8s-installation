@@ -12,6 +12,7 @@
     - python3-pip
     - bash-completion
     - python3-kubernetes
+    - open-iscsi
   become: true
   when: ansible_os_family == 'Debian'
 
@@ -34,18 +35,24 @@
     - name: Adding repo for containerd
       when: ansible_os_family == 'Debian' and ansible_architecture == 'x86_64'
       ansible.builtin.apt_repository:
-        repo: "deb [arch=amd64 signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/{{ ansible_distribution | lower }} {{ ansible_distribution_release | lower }} stable"
+        repo: "{{ repo_info }} {{ repo_url }}"
         filename: docker
         update_cache: true
         state: present
+      vars:
+        repo_info: "deb [arch=amd64 signed-by=/etc/apt/keyrings/docker.asc]"
+        repo_url: "https://download.docker.com/linux/{{ ansible_distribution | lower }} {{ ansible_distribution_release | lower }} stable"
 
     - name: Adding repo for containerd
       when: ansible_os_family == 'Debian' and ansible_architecture == 'aach64'
       ansible.builtin.apt_repository:
-        repo: "deb [arch=arm64 signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/{{ ansible_distribution | lower }} {{ ansible_distribution_release | lower }} stable"
+        repo: "{{ repo_info }} {{ repo_url }}"
         filename: docker
         update_cache: true
         state: present
+      vars:
+        repo_info: "deb [arch=arm64 signed-by=/etc/apt/keyrings/docker.asc]"
+        repo_url: "https://download.docker.com/linux/{{ ansible_distribution | lower }} {{ ansible_distribution_release | lower }} stable"
 
     - name: Installing containerd
       ansible.builtin.apt:

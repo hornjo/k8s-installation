@@ -1,14 +1,17 @@
 ---
 all:
   vars:
-    ansible_user: user
+    ansible_user: root
   children:
     control-nodes:
       hosts:
         lx-k8s-ctl01:
+          ansible_host: 195.201.20.243
         lx-k8s-ctl02:
+          ansible_host: 195.201.225.1
         lx-k8s-ctl03:
+          ansible_host: 159.69.45.41
     worker-nodes:
       hosts:
-        lx-k8s-wrk01:
-        lx-k8s-wrk02:
+        # lx-k8s-wrk01:
+        # lx-k8s-wrk02:

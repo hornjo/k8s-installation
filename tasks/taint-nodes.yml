@@ -1,0 +1,11 @@
+---
+- name: Taint control plane
+  when: k8s_installation_control_plane_workload is true
+  kubernetes.core.k8s_taint:
+    state: absent
+    name: "{{ item }}"
+    taints:
+      - effect: NoSchedule
+        key: "node-role.kubernetes.io/control-plane"
+  loop: "{{ groups['control-nodes'] }}"
+  become: true

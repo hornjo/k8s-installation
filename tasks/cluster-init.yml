@@ -34,6 +34,8 @@
     path: $HOME/.kube
     state: directory
     mode: "0755"
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
   become: true
 
 - name: Copy the kubectl config to control node
@@ -42,6 +44,15 @@
     dest: $HOME/.kube/config
     remote_src: true
     mode: "0755"
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+  become: true
+
+- name: Copy the kubectl config to ansible node
+  ansible.builtin.fetch:
+    src: /etc/kubernetes/admin.conf
+    dest: "~/.kube/ansible-cluster-config/"
+    flat: true
   become: true
 
 - name: Generating join certificate for control nodes

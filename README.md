@@ -36,3 +36,7 @@ Including an example of how to use your role (for instance, with variables passe
             k8s_installation_podnetwork: "192.200.55.0/24"
             k8s_installation_control_plane_workload: true
 
+Release
+-------
+
+v1.0.1

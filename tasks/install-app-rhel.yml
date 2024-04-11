@@ -11,6 +11,12 @@
   become: true
   when: ansible_os_family == 'RedHat'
 
+- name: Enable and start iscsi
+  ansible.builtin.service:
+    name: iscsid.service
+    state: started
+    enabled: true
+
 - name: Install and container runtime for RHEL
   when: ansible_os_family == 'RedHat'
   become: true

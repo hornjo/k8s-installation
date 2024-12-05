@@ -60,6 +60,13 @@
         state: present
       become: true
 
+    - name: Make sure containerd directory exists
+      ansible.builtin.file:
+        path: /etc/containerd
+        state: directory
+        mode: '0755'
+      become: true
+
     - name: Configuring containerd by adding the default config
       ansible.builtin.copy:
         src: config.toml
